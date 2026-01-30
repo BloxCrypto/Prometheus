@@ -4,9 +4,23 @@
   "description": "Professional JavaScript and HTML Obfuscator - Web Version",
   "main": "api/obfuscate.js",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'Build complete'",
-    "start": "node -e 'console.log(\"Prometheus Web Obfuscator ready\")'"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0"
   },
   "keywords": [
     "obfuscator",
@@ -14,7 +28,9 @@
     "html",
     "security",
     "minifier",
-    "vercel"
+    "vercel",
+    "react",
+    "next.js"
   ],
   "author": "BloxCrypto",
   "license": "MIT",

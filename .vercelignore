@@ -1,11 +1,23 @@
-node_modules
-*.lua
-tests
-doc
+# Exclude unnecessary files from Vercel deployment
 .git
 .github
+.next
+.vercelignore
+node_modules
+
+# Lua obfuscator files (keep only web-obfuscator for API use)
 benchmark.lua
 cli.lua
 prometheus-main.lua
 readme.txt
 tests.lua
+tests/
+
+# Documentation (not needed in production)
+doc/
+
+# Development files
+*.env.local
+*.log
+.eslintcache
+coverage/
