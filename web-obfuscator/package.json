@@ -1,0 +1,26 @@
+{
+  "name": "prometheus-web-obfuscator",
+  "version": "1.0.0",
+  "description": "A powerful JavaScript and HTML obfuscator - web version of Prometheus",
+  "main": "src/index.js",
+  "bin": {
+    "prometheus-web": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node test/tests.js",
+    "dev": "node src/cli.js"
+  },
+  "keywords": [
+    "obfuscator",
+    "javascript",
+    "html",
+    "security",
+    "minifier"
+  ],
+  "author": "Prometheus Contributors",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "acorn": "^8.11.3"
+  }
+}

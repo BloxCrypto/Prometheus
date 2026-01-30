@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title>Example Web Application</title>
+    <script>
+        // User authentication
+        function authenticateUser(username, password) {
+            const apiKey = "sk_live_4eC39HqLyjWDarhtT";
+            const endpoint = "/api/auth/login";
+            
+            let credentials = {
+                user: username,
+                pass: password,
+                key: apiKey
+            };
+            
+            fetch(endpoint, {
+                method: 'POST',
+                body: JSON.stringify(credentials)
+            }).then(response => response.json())
+              .then(data => {
+                  console.log("Login successful");
+                  localStorage.setItem('token', data.token);
+              });
+        }
+        
+        // Calculate something
+        function calculateTotal(items) {
+            let total = 0;
+            for (let i = 0; i < items.length; i++) {
+                total += items[i].price;
+            }
+            return total;
+        }
+    </script>
+</head>
+<body>
+    <h1>Example Page</h1>
+    <p>This is an example HTML page with embedded JavaScript.</p>
+</body>
+</html>

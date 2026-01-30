@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prometheus Web Obfuscator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            resize: none;
+            background: #f8f8f8;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .preset-group,
+        .option-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .preset-group label,
+        .option-group label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        select, input[type="checkbox"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        select {
+            padding: 8px 12px;
+            cursor: pointer;
+            background: white;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .option-group {
+            display: flex;
+            gap: 20px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-obfuscate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-obfuscate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-copy {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-copy:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-clear {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .btn-clear:hover {
+            background: #ffcdd2;
+        }
+
+        .stats {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .error {
+            color: #c62828;
+            margin-top: 10px;
+            padding: 10px;
+            background: #ffebee;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success {
+            color: #2e7d32;
+            margin-top: 10px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Prometheus Web Obfuscator</h1>
+            <p>Obfuscate JavaScript and HTML to protect your code</p>
+        </div>
+
+        <div class="content">
+            <!-- Input Section -->
+            <div class="section">
+                <h2>Input Code</h2>
+
+                <div class="controls">
+                    <div class="preset-group">
+                        <label for="preset">Preset:</label>
+                        <select id="preset">
+                            <option value="light">Light</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <div class="option-group">
+                        <div class="option-item">
+                            <input type="checkbox" id="renameVariables" checked>
+                            <label for="renameVariables">Rename Variables</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" id="encryptStrings">
+                            <label for="encryptStrings">Encrypt Strings</label>
+                        </div>
+                        <div class="option-item">
+                            <input type="checkbox" id="injectDeadCode">
+                            <label for="injectDeadCode">Inject Dead Code</label>
+                        </div>
+                    </div>
+                </div>
+
+                <textarea id="inputCode" placeholder="Paste your JavaScript or HTML code here...">// Example: Simple JavaScript
+function greet(name) {
+  let message = "Hello, " + name;
+  console.log(message);
+}
+
+greet("World");</textarea>
+
+                <div class="buttons">
+                    <button class="btn-obfuscate" onclick="obfuscate()">Obfuscate Code</button>
+                    <button class="btn-clear" onclick="clearInput()">Clear</button>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="section">
+                <h2>Obfuscated Code</h2>
+                <textarea id="outputCode" placeholder="Obfuscated code will appear here..." readonly></textarea>
+
+                <div class="buttons">
+                    <button class="btn-copy" onclick="copyOutput()">Copy to Clipboard</button>
+                    <button class="btn-clear" onclick="clearOutput()">Clear</button>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Input Size</div>
+                        <div class="stat-value" id="inputSize">0 B</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Output Size</div>
+                        <div class="stat-value" id="outputSize">0 B</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Reduction</div>
+                        <div class="stat-value" id="reduction">0%</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Processing Time</div>
+                        <div class="stat-value" id="processingTime">0 ms</div>
+                    </div>
+                </div>
+
+                <div class="error" id="error"></div>
+                <div class="success" id="success"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Prometheus Web Obfuscator - Protect your JavaScript and HTML code from reverse engineering</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">⚠️ Note: Obfuscation provides code protection through obscurity, not encryption. For truly sensitive data, use server-side processing.</p>
+        </div>
+    </div>
+
+    <script>
+        // Simple JavaScript obfuscation logic (client-side demo)
+        
+        function getOptions() {
+            return {
+                preset: document.getElementById('preset').value,
+                renameVariables: document.getElementById('renameVariables').checked,
+                encryptStrings: document.getElementById('encryptStrings').checked,
+                injectDeadCode: document.getElementById('injectDeadCode').checked,
+                compact: true
+            };
+        }
+
+        function updatePreset(preset) {
+            const presets = {
+                light: {
+                    renameVariables: false,
+                    encryptStrings: false,
+                    injectDeadCode: false
+                },
+                medium: {
+                    renameVariables: true,
+                    encryptStrings: false,
+                    injectDeadCode: false
+                },
+                high: {
+                    renameVariables: true,
+                    encryptStrings: true,
+                    injectDeadCode: true
+                }
+            };
+
+            const config = presets[preset];
+            document.getElementById('renameVariables').checked = config.renameVariables;
+            document.getElementById('encryptStrings').checked = config.encryptStrings;
+            document.getElementById('injectDeadCode').checked = config.injectDeadCode;
+        }
+
+        function generateObfuscatedName() {
+            let name = '_0x' + Math.floor(Math.random() * 65536).toString(16).padStart(4, '0');
+            return name;
+        }
+
+        function simpleObfuscate(code, options) {
+            let result = code;
+            
+            // Compact code
+            result = result
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line && !line.startsWith('//'))
+                .join('')
+                .replace(/\/\*[\s\S]*?\*\//g, '')
+                .replace(/\s+/g, ' ')
+                .replace(/\s*([{}();:,])\s*/g, '$1');
+
+            // Rename variables
+            if (options.renameVariables) {
+                const varPattern = /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g;
+                const vars = new Set();
+                let match;
+                while ((match = varPattern.exec(code)) !== null) {
+                    if (!['function', 'return', 'let', 'const', 'var', 'if', 'else', 'for', 'while', 'console', 'log', 'true', 'false', 'null', 'undefined'].includes(match[1])) {
+                        vars.add(match[1]);
+                    }
+                }
+
+                const varMap = {};
+                vars.forEach(v => {
+                    varMap[v] = generateObfuscatedName();
+                });
+
+                for (const [original, renamed] of Object.entries(varMap)) {
+                    const regex = new RegExp(`\\b${original}\\b`, 'g');
+                    result = result.replace(regex, renamed);
+                }
+            }
+
+            // Encrypt strings
+            if (options.encryptStrings) {
+                result = result.replace(/"([^"]*)"/g, (match) => {
+                    const content = match.slice(1, -1);
+                    let encrypted = '';
+                    for (let i = 0; i < content.length; i++) {
+                        encrypted += '\\x' + content.charCodeAt(i).toString(16).padStart(2, '0');
+                    }
+                    return '"' + encrypted + '"';
+                });
+            }
+
+            return result;
+        }
+
+        function obfuscate() {
+            const input = document.getElementById('inputCode').value;
+            const errorDiv = document.getElementById('error');
+            const successDiv = document.getElementById('success');
+
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            if (!input.trim()) {
+                errorDiv.textContent = 'Please enter code to obfuscate';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                const options = getOptions();
+                const output = simpleObfuscate(input, options);
+                const endTime = performance.now();
+
+                document.getElementById('outputCode').value = output;
+                updateStats(input.length, output.length, endTime - startTime);
+
+                successDiv.textContent = 'Code obfuscated successfully!';
+                successDiv.style.display = 'block';
+            } catch (error) {
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function updateStats(inputSize, outputSize, processingTime) {
+            document.getElementById('inputSize').textContent = formatBytes(inputSize);
+            document.getElementById('outputSize').textContent = formatBytes(outputSize);
+            
+            const reduction = Math.round(((inputSize - outputSize) / inputSize) * 100);
+            document.getElementById('reduction').textContent = reduction + '%';
+            document.getElementById('processingTime').textContent = processingTime.toFixed(2) + ' ms';
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function copyOutput() {
+            const outputCode = document.getElementById('outputCode');
+            if (!outputCode.value) {
+                document.getElementById('error').textContent = 'No code to copy';
+                document.getElementById('error').style.display = 'block';
+                return;
+            }
+
+            outputCode.select();
+            document.execCommand('copy');
+
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = 'Code copied to clipboard!';
+            successDiv.style.display = 'block';
+            setTimeout(() => { successDiv.style.display = 'none'; }, 3000);
+        }
+
+        function clearInput() {
+            document.getElementById('inputCode').value = '';
+            document.getElementById('inputCode').focus();
+        }
+
+        function clearOutput() {
+            document.getElementById('outputCode').value = '';
+        }
+
+        // Event listeners
+        document.getElementById('preset').addEventListener('change', (e) => {
+            updatePreset(e.target.value);
+        });
+
+        // Initialize
+        updatePreset('medium');
+    </script>
+</body>
+</html>
